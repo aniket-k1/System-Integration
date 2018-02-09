@@ -35,6 +35,8 @@ class Controller(object):
         self.velocity_low_pass_filter = LowPassFilter(1.0, 0.02)
         self.vel_ref_low_pass_filter  = LowPassFilter(0.2, 0.02)
         self.acc_ref_low_pass_filter  = LowPassFilter(0.2, 0.02)
+	self.steer_low_filter = LowPassFilter(0.2, 0.1)
+	self.angular_velocity_low_filter = LowPassFilter(0.2, 0.08)
         # Initialize controllers.
         self.yaw_controller = YawController(wheel_base, steer_ratio, min_speed,
                                             max_lat_accel, max_steer_angle)
@@ -42,6 +44,8 @@ class Controller(object):
                                            self.decel_limit, self.accel_limit)
         self.acceleration_controller = PID(0.5, 0.4, 0.0,
                                            -1.0, 1.0)
+	self.steering_controller = PID(2.0, 0.0005, 0.05,
+                                           -self.max_steer_angle, self.max_steer_angle)
 
     def control(self, linear_velocity_ref, angular_velocity_ref, current_velocity,
                 dbw_status):
@@ -51,6 +55,7 @@ class Controller(object):
             if self.dbw_status == True:
                 self.velocity_controller.reset()
                 self.acceleration_controller.reset()
+		self.steering_controller.reset()
                 self.dbw_status = False
             return None, None, None
 
@@ -70,12 +75,16 @@ class Controller(object):
 
         # Filter current velocity.
         linear_velocity_ref = self.vel_ref_low_pass_filter.filt(linear_velocity_ref)
+	current_velocity_orig = current_velocity
         current_velocity = self.velocity_low_pass_filter.filt(current_velocity)
         current_acceleration = (current_velocity - self.last_velocity) / sample_time
 
         # Control steering.
+	angular_velocity_ref = self.angular_velocity_low_filter.filt(angular_velocity_ref)
         steering = self.yaw_controller.get_steering(linear_velocity_ref, angular_velocity_ref,
-                                                    current_velocity)
+                                                    current_velocity_orig)
+	steering = self.steering_controller.step(steering, sample_time)	
+	steering = self.steer_low_filter.filt(steering)
 
         # Control velocity with output acceleration.
         velocity_error = linear_velocity_ref - current_velocity
