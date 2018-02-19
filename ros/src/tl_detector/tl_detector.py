@@ -205,9 +205,11 @@ class TLDetector(object):
 
         #if light too far away do not bother
         if self.wp2light > 200:
+            rospy.loginfo('Detector: Too far away')
             return 4
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        rospy.loginfo('Detector: Getting value from classifier')
         return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
