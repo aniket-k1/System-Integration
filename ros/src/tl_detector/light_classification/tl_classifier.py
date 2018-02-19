@@ -117,12 +117,15 @@ class TLClassifier(object):
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         box = self.detection(image)
         if box == None:
+            rospy.loginfo('Classifier: No box found')
             return TrafficLight.UNKNOWN
 
         left, right, top, bottom = box
         img_crop = image[top:bottom, left:right]
         traffic_light = cv2.resize(img_crop, (32, 32))
-        return self.classification(traffic_light)
+        classification = self.classification(traffic_light)
+        rospy.loginfo('Classifier: Found traffic light: ' + str(classification))
+        return classification
 
     def detection(self, image):
         im_height, im_width, _ = image.shape
