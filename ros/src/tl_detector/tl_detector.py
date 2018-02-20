@@ -97,6 +97,8 @@ class TLDetector(object):
         self.has_image = True
         self.camera_image = msg
 
+        rospy.loginfo('Detector: image cb')
+
         light_wp, state = self.process_traffic_lights()
 
         '''
@@ -112,10 +114,10 @@ class TLDetector(object):
             self.last_state = self.state                            # set last_state
             light_wp = light_wp if state == TrafficLight.RED else -1# set light_wp only if red
             self.last_wp = light_wp
-            #rospy.loginfo("publish light-wp = %d",light_wp)
+            rospy.loginfo("publish light-wp = %d",light_wp)
             self.upcoming_red_light_pub.publish(Int32(light_wp))
         else:                                                       # if not sure use use last_wp
-            #rospy.loginfo("not sure ... publish light-wp = %d",self.last_wp)
+            rospy.loginfo("not sure ... publish light-wp = %d",self.last_wp)
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
 
@@ -257,7 +259,7 @@ class TLDetector(object):
                 #rospy.loginfo("cheat state = %d", state)
             else:
                 state = self.get_light_state(light)
-            #rospy.loginfo('process_tl: car-wp=%d, light-wp=%d, d=%d state=%d', car_wp, l_wp, self.wp2light, state)
+            rospy.loginfo('process_tl: car-wp=%d, light-wp=%d, d=%d state=%d', car_wp, l_wp, self.wp2light, state)
             return l_wp, state
 
         return -1, TrafficLight.UNKNOWN
