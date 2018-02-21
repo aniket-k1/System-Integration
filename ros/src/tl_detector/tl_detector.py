@@ -61,6 +61,8 @@ class TLDetector(object):
         self.light_classifier = TLClassifier(simulator=self.simulator)
         self.listener = tf.TransformListener()
 
+        self.count = 0
+
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -209,6 +211,8 @@ class TLDetector(object):
             return 4
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        cv2.imwrite('light_classification/test_data/detector/image{}.jpg'.format(self.count), cv_image)
+        self.count = self.count + 1
         rospy.loginfo('Detector: Getting value from classifier')
         return self.light_classifier.get_classification(cv_image)
 
