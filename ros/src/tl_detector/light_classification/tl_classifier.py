@@ -33,7 +33,7 @@ def extractBox(boxes, scores, classes, confidence, im_width, im_height):
     maxConf = 0
     number = -1
     for i in range(boxes.shape[0]):
-        if scores[i] > confidence and classes[i] == 10:
+        if scores[i] > confidence:
             if scores[i] > maxConf:
                 maxConf = scores[i]
                 number = i
