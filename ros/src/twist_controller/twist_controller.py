@@ -37,6 +37,7 @@ class Controller(object):
         self.acc_ref_low_pass_filter  = LowPassFilter(0.2, 0.02)
 	self.steer_low_filter = LowPassFilter(0.2, 0.1)
 	self.angular_velocity_low_filter = LowPassFilter(0.2, 0.08)
+	self.cte_low_filter = LowPassFilter(0.2, 0.08)
         # Initialize controllers.
         self.yaw_controller = YawController(wheel_base, steer_ratio, min_speed,
                                             max_lat_accel, max_steer_angle)
@@ -48,7 +49,7 @@ class Controller(object):
                                            -self.max_steer_angle, self.max_steer_angle)
 
     def control(self, linear_velocity_ref, angular_velocity_ref, current_velocity,
-                dbw_status):
+                dbw_status, cte):
         # If the car is controlled by driver, reset controllers once and do
         # not return values.
         if dbw_status != True:
@@ -81,9 +82,10 @@ class Controller(object):
 
         # Control steering.
 	angular_velocity_ref = self.angular_velocity_low_filter.filt(angular_velocity_ref)
+	cte = self.cte_low_filter.filt(cte)
         steering = self.yaw_controller.get_steering(linear_velocity_ref, angular_velocity_ref,
                                                     current_velocity_orig)
-	steering = self.steering_controller.step(steering, sample_time)	
+	steering = self.steering_controller.step(steering+0.04*cte, sample_time)	
 	steering = self.steer_low_filter.filt(steering)
 
         # Control velocity with output acceleration.

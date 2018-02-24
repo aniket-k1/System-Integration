@@ -102,7 +102,7 @@ double PurePursuit::calcCurvature(geometry_msgs::Point target) const
 }
 
 // linear interpolation of next target
-bool PurePursuit::interpolateNextTarget(int next_waypoint, geometry_msgs::Point *next_target) const
+bool PurePursuit::interpolateNextTarget(int next_waypoint, geometry_msgs::Point *next_target, double *distance) const
 {
   constexpr double ERROR = pow(10, -5);  // 0.00001
 
@@ -140,6 +140,8 @@ bool PurePursuit::interpolateNextTarget(int next_waypoint, geometry_msgs::Point 
 
   if (d > search_radius)
     return false;
+
+  *distance = getDistanceBetweenLineAndPointSigned(current_pose_.pose.position, a, b, c);
 
   // unit vector of point 'start' to point 'end'
   tf::Vector3 v((end.x - start.x), (end.y - start.y), 0);
@@ -381,7 +383,8 @@ geometry_msgs::TwistStamped PurePursuit::go()
   }
 
   // linear interpolation and calculate angular velocity
-  interpolate_flag = interpolateNextTarget(num_of_next_waypoint_, &position_of_next_target_);
+  double distance = 1e-8;
+  interpolate_flag = interpolateNextTarget(num_of_next_waypoint_, &position_of_next_target_, &distance);
 
   if (!interpolate_flag)
   {
@@ -391,7 +394,9 @@ geometry_msgs::TwistStamped PurePursuit::go()
 
   // ROS_INFO("next_target : ( %lf , %lf , %lf)", next_target.x, next_target.y,next_target.z);
 
-  return outputTwist(calcTwist(calcCurvature(position_of_next_target_), getCmdVelocity(0)));
+  geometry_msgs::TwistStamped twist = outputTwist(calcTwist(calcCurvature(position_of_next_target_), getCmdVelocity(0)));
+  twist.twist.angular.x = distance;
+  return twist;
 
 // ROS_INFO("linear : %lf, angular : %lf",twist.twist.linear.x,twist.twist.angular.z);
 

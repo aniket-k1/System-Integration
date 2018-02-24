@@ -81,7 +81,7 @@ private:
   void calcLookaheadDistance(int waypoint);
   double calcCurvature(geometry_msgs::Point target) const;
   double calcRadius(geometry_msgs::Point target) const;
-  bool interpolateNextTarget(int next_waypoint, geometry_msgs::Point *next_target) const;
+  bool interpolateNextTarget(int next_waypoint, geometry_msgs::Point *next_target, double *distance) const;
   bool verifyFollowing() const;
   geometry_msgs::Twist calcTwist(double curvature, double cmd_velocity) const;
   void getNextWaypoint();

@@ -268,6 +268,13 @@ double getDistanceBetweenLineAndPoint(geometry_msgs::Point point, double a, doub
   return d;
 }
 
+double getDistanceBetweenLineAndPointSigned(geometry_msgs::Point point, double a, double b, double c)
+{
+  double d = (a * point.x + b * point.y + c) / sqrt(pow(a, 2) + pow(b, 2));
+
+  return d;
+}
+
 tf::Vector3 point2vector(geometry_msgs::Point point)
 {
   tf::Vector3 vector(point.x, point.y, point.z);
