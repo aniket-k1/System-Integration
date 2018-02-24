@@ -211,9 +211,9 @@ class TLDetector(object):
             return 4
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-        cv2.imwrite('light_classification/test_data/detector/image{}.jpg'.format(self.count), cv_image)
-        self.count = self.count + 1
-        rospy.loginfo('Detector: Getting value from classifier')
+        #cv2.imwrite('light_classification/test_data/detector/image{}.jpg'.format(self.count), cv_image)
+        #self.count = self.count + 1
+        #rospy.loginfo('Detector: Getting value from classifier')
         return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
@@ -257,13 +257,13 @@ class TLDetector(object):
         #rospy.loginfo("cheat index = %d", cheat_state_index)
 
         if light:
-            rospy.loginfo('Detector: Ready to get light state')
+            #rospy.loginfo('Detector: Ready to get light state')
             if (CHEAT_TRAFFIC_LIGHTS and (cheat_state_index != -1)):
                 state = self.states[cheat_state_index]
                 #rospy.loginfo("cheat state = %d", state)
             else:
                 state = self.get_light_state(light)
-            rospy.loginfo('process_tl: car-wp=%d, light-wp=%d, d=%d state=%d', car_wp, l_wp, self.wp2light, state)
+            #rospy.loginfo('process_tl: car-wp=%d, light-wp=%d, d=%d state=%d', car_wp, l_wp, self.wp2light, state)
             return l_wp, state
 
         rospy.loginfo('Detector: Conditions not met')

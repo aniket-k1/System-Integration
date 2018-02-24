@@ -61,6 +61,7 @@ def extractBox(boxes, scores, classes, confidence, im_width, im_height):
         if right > im_width:
             right = im_width
         box = int(left), int(right), int(top), int(bottom)
+        rospy.loginfo("Classifier: class " + str(classes[number]) + " score " + str(scores[number])) 
         return box
 
     else:
@@ -117,14 +118,14 @@ class TLClassifier(object):
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         box = self.detection(image)
         if box == None:
-            rospy.loginfo('Classifier: No box found')
+            #rospy.loginfo('Classifier: No box found')
             return TrafficLight.UNKNOWN
 
         left, right, top, bottom = box
         img_crop = image[top:bottom, left:right]
         traffic_light = cv2.resize(img_crop, (32, 32))
         classification = self.classification(traffic_light)
-        rospy.loginfo('Classifier: Found traffic light: ' + str(classification))
+        rospy.loginfo('Classifier: Found traffic light: ' + str(self.labels.get(classification)))
         return classification
 
     def detection(self, image):
@@ -156,8 +157,9 @@ if __name__ == "__main__":
     # Red
 
     # Those are the paths for our test images
-    path = '/home/student/CarND-Capstone/ros/src/tl_detector/light_classification/test_data/sim'
+    # path = '/home/student/CarND-Capstone/ros/src/tl_detector/light_classification/test_data/sim'
     # path = 'test_data/site'
+    path = '/capstone/ros/src/tl_detector/light_classification/test_data/sim'
     image_paths = [ os.path.join(path, 'image{}.jpg'.format(i)) for i in range(0, 9) ]
 
 
