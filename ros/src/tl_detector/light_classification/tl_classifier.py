@@ -61,7 +61,6 @@ def extractBox(boxes, scores, classes, confidence, im_width, im_height):
         if right > im_width:
             right = im_width
         box = int(left), int(right), int(top), int(bottom)
-        rospy.loginfo("Classifier: class " + str(classes[number]) + " score " + str(scores[number])) 
         return box
 
     else:
@@ -135,7 +134,7 @@ class TLClassifier(object):
         with self.session_detection.as_default(), self.graph_detection.as_default():
             boxes, scores, classes = self.session_detection.run([self.detection_boxes, self.detection_scores, self.detection_classes],
                 feed_dict={self.image_tensor: image_expanded})
-            return extractBox(boxes, scores, classes, 0.1, im_width, im_height)
+            return extractBox(boxes, scores, classes, 0.6, im_width, im_height)
 
     def classification(self, image):
         with self.session_classification.as_default(), self.graph_classification.as_default():
