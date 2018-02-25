@@ -101,6 +101,7 @@ class TLClassifier(object):
         self.out_graph = self.graph_classification.get_tensor_by_name('output_0:0')
 
         self.labels = {0: TrafficLight.RED, 1: TrafficLight.GREEN, 2: TrafficLight.YELLOW}
+        self.image_types = ["Red", "Green", "Yellow"]
 
 
     def get_classification(self, image):
@@ -124,7 +125,6 @@ class TLClassifier(object):
         img_crop = image[top:bottom, left:right]
         traffic_light = cv2.resize(img_crop, (32, 32))
         classification = self.classification(traffic_light)
-        rospy.loginfo('Classifier: Found traffic light: ' + str(self.labels.get(classification)))
         return classification
 
     def detection(self, image):
@@ -140,6 +140,7 @@ class TLClassifier(object):
         with self.session_classification.as_default(), self.graph_classification.as_default():
             sfmax = list(self.session_classification.run(tf.nn.softmax(self.out_graph.eval(feed_dict={self.in_graph: [image]}))))
             sf_ind = sfmax.index(max(sfmax))
+            rospy.loginfo('Classifier: Found traffic light: ' + self.image_types[sf_ind])
             return self.labels[sf_ind]
 
 if __name__ == "__main__":
